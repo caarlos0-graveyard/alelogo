@@ -10,7 +10,11 @@ import (
 	"time"
 )
 
-const url = "https://www.meualelo.com.br/meualelo.services/rest"
+// Config of the client
+type Config struct {
+	BaseURL string
+	Timeout int
+}
 
 // ErrAuth happens on authentication failures
 var ErrAuth = errors.New("Authentication failure")
@@ -18,29 +22,47 @@ var ErrAuth = errors.New("Authentication failure")
 // ErrDumbass happens when random shit happens
 var ErrDumbass = errors.New("Random shit happened within Alelo API, try again")
 
+// DefaultConfig for the client
+var DefaultConfig = Config{
+	BaseURL: "https://www.meualelo.com.br/meualelo.services/rest",
+	Timeout: 30,
+}
+
 // Client for Alelo API
 type Client struct {
 	http.Client
+	BaseURL string
 }
 
-func New(cpf, pwd string) (*Client, error) {
+// New client with defaults
+func New(cpf, pwd string, configs ...Config) (*Client, error) {
+	var config = DefaultConfig
+	if len(configs) > 0 {
+		config = configs[0]
+	}
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, err
 	}
 	client := &Client{
 		http.Client{
-			Timeout: time.Second * 30,
+			Timeout: time.Duration(config.Timeout) * time.Second,
 			Jar:     jar,
-		},
+		}, config.BaseURL,
 	}
 	return client, client.login(cpf, pwd)
 }
 
 func (client *Client) login(cpf, pwd string) (err error) {
 	pwd = base64.StdEncoding.EncodeToString([]byte(pwd))
-	json := "{\"cpf\":\"" + cpf + "\",\"pwd\":\"" + pwd + "\",\"captchaResponse\":\"\"}"
-	req, err := http.NewRequest("POST", url+"/login/authenticate", strings.NewReader(json))
+	json := "{\"cpf\":\"" + cpf +
+		"\",\"pwd\":\"" + pwd +
+		"\",\"captchaResponse\":\"\"}"
+	req, err := http.NewRequest(
+		"POST",
+		client.BaseURL+"/login/authenticate",
+		strings.NewReader(json),
+	)
 	if err != nil {
 		return err
 	}
@@ -55,7 +77,11 @@ func (client *Client) login(cpf, pwd string) (err error) {
 
 // Balance get the user card's balances
 func (client *Client) Balance() (cards []Card, err error) {
-	req, err := http.NewRequest("GET", url+"/user/card/preference/list", nil)
+	req, err := http.NewRequest(
+		"GET",
+		client.BaseURL+"/user/card/preference/list",
+		nil,
+	)
 	if err != nil {
 		return cards, err
 	}

@@ -1,0 +1,14 @@
+{
+  "uid": "fake-uid",
+  "cardList": [
+    {
+      "cardType": "ALELO_REFEICAO",
+      "title": " [1234]",
+      "balance": "R$ 123,45",
+      "preferedCardId": "",
+      "cardId": "fake-card-id",
+      "automaticAddition": true,
+      "showCardBalance": true
+    }
+  ]
+}
