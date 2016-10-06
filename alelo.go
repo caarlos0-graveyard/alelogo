@@ -13,6 +13,9 @@ const url = "https://www.meualelo.com.br/meualelo.services/rest"
 // ErrAuth happens on authentication failures
 var ErrAuth = errors.New("Authentication failure")
 
+// ErrDumbass happens when random shit happens
+var ErrDumbass = errors.New("Random shit happened within Alelo API, try again")
+
 // Login a user and return the cookies
 func Login(cpf, pwd string) (cookies []*http.Cookie, err error) {
 	pwd = base64.StdEncoding.EncodeToString([]byte(pwd))
@@ -44,7 +47,8 @@ func Balance(cookies []*http.Cookie) (cards []Card, err error) {
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return cards, ErrAuth
+		// this should never happen
+		return cards, ErrDumbass
 	}
 	var preferences preferencesJSON
 	err = json.NewDecoder(resp.Body).Decode(&preferences)
