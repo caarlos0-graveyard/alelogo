@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/http/cookiejar"
 	"strings"
+	"time"
 )
 
 const url = "https://www.meualelo.com.br/meualelo.services/rest"
@@ -16,33 +18,46 @@ var ErrAuth = errors.New("Authentication failure")
 // ErrDumbass happens when random shit happens
 var ErrDumbass = errors.New("Random shit happened within Alelo API, try again")
 
-// Login a user and return the cookies
-func Login(cpf, pwd string) (cookies []*http.Cookie, err error) {
+// Client for Alelo API
+type Client struct {
+	http.Client
+}
+
+func New(cpf, pwd string) (*Client, error) {
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return nil, err
+	}
+	client := &Client{
+		http.Client{
+			Timeout: time.Second * 30,
+			Jar:     jar,
+		},
+	}
+	return client, client.login(cpf, pwd)
+}
+
+func (client *Client) login(cpf, pwd string) (err error) {
 	pwd = base64.StdEncoding.EncodeToString([]byte(pwd))
 	json := "{\"cpf\":\"" + cpf + "\",\"pwd\":\"" + pwd + "\",\"captchaResponse\":\"\"}"
-	client := &http.Client{}
 	req, err := http.NewRequest("POST", url+"/login/authenticate", strings.NewReader(json))
 	if err != nil {
-		return cookies, err
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return cookies, ErrAuth
+		return ErrAuth
 	}
-	return resp.Cookies(), err
+	return err
 }
 
 // Balance get the user card's balances
-func Balance(cookies []*http.Cookie) (cards []Card, err error) {
-	client := &http.Client{}
+func (client *Client) Balance() (cards []Card, err error) {
 	req, err := http.NewRequest("GET", url+"/user/card/preference/list", nil)
 	if err != nil {
 		return cards, err
-	}
-	for _, cookie := range cookies {
-		req.AddCookie(cookie)
 	}
 	resp, err := client.Do(req)
 	defer resp.Body.Close()

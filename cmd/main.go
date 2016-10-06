@@ -1,9 +1,8 @@
 package main
 
 import (
-	"os"
-
 	"fmt"
+	"os"
 
 	"github.com/caarlos0/alelogo"
 )
@@ -12,11 +11,11 @@ func main() {
 	if len(os.Args) != 3 {
 		panic("You must pass the CPF and password as args 1 and 2")
 	}
-	cookies, err := alelogo.Login(os.Args[1], os.Args[2])
+	client, err := alelogo.New(os.Args[1], os.Args[2])
 	if err != nil {
 		panic(err)
 	}
-	cards, err := alelogo.Balance(cookies)
+	cards, err := client.Balance()
 	if err != nil {
 		panic(err)
 	}
