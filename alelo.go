@@ -68,6 +68,9 @@ func (client *Client) login(cpf, pwd string) (err error) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		return ErrAuth
