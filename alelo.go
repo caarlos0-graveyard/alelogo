@@ -89,6 +89,9 @@ func (client *Client) Balance() (cards []Card, err error) {
 		return cards, err
 	}
 	resp, err := client.Do(req)
+	if err != nil {
+		return cards, err
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		// this should never happen
