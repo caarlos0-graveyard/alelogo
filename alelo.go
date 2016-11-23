@@ -78,8 +78,8 @@ func (client *Client) login(cpf, pwd string) (err error) {
 	return err
 }
 
-// Balance get the user card's balances
-func (client *Client) Balance() (cards []Card, err error) {
+// Cards get the user card's balances
+func (client *Client) Cards() (cards []Card, err error) {
 	req, err := http.NewRequest(
 		"GET",
 		client.BaseURL+"/user/card/preference/list",
@@ -102,14 +102,43 @@ func (client *Client) Balance() (cards []Card, err error) {
 	return preferences.List, err
 }
 
+func (client *Client) Details(card Card) (CardDetails, error) {
+	var details CardDetails
+	req, err := http.NewRequest(
+		"GET",
+		client.BaseURL+"/user/card/balance?selectedCardNumberId="+card.ID,
+		nil,
+	)
+	if err != nil {
+		return details, err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return details, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		// this should never happen
+		return details, ErrDumbass
+	}
+	err = json.NewDecoder(resp.Body).Decode(&details)
+	return details, err
+}
+
 // Card type
 type Card struct {
-	ID      string `json:"cardId"`
-	Title   string `json:"title"`
-	Balance string `json:"balance"`
+	ID    string `json:"cardId"`
+	Title string `json:"title"`
 }
 
 type preferencesJSON struct {
 	UID  string `json:"uid"`
 	List []Card `json:"cardList"`
+}
+
+// CardDetails type
+type CardDetails struct {
+	Balance string `json:"balance"`
+	Name    string `json:"productName"`
+	Type    string `json:"cardType"`
 }
