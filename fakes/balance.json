@@ -1,14 +1,12 @@
 {
-  "uid": "fake-uid",
-  "cardList": [
-    {
-      "cardType": "ALELO_REFEICAO",
-      "title": " [1234]",
-      "balance": "R$ 123,45",
-      "preferedCardId": "",
-      "cardId": "fake-card-id",
-      "automaticAddition": true,
-      "showCardBalance": true
-    }
-  ]
+  "bestDayToSpend": null,
+  "maskedNumber": "XXXX.XXXX.XXXX.0123",
+  "cardId": "fake-id",
+  "balance": "R$ 123,45",
+  "executionDate": "23/11/2016 - 19:01",
+  "showbuttonBalance": false,
+  "productName": "Alelo Refeição",
+  "dailySpending": "R$ 17,71",
+  "cardType": "ALELO_REFEICAO",
+  "showCardBalance": true
 }
