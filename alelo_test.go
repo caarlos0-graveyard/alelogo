@@ -12,7 +12,6 @@ import (
 )
 
 func TestSuccessLoginAndBalance(t *testing.T) {
-	f, _ := os.Open("./fakes/balance.json")
 	ts := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			log.Println(r.URL.Path)
@@ -20,6 +19,13 @@ func TestSuccessLoginAndBalance(t *testing.T) {
 				w.Write([]byte("OK"))
 			}
 			if r.URL.Path == "/user/card/preference/list" {
+				f, _ := os.Open("./fakes/preferences_list.json")
+				bts, _ := ioutil.ReadAll(f)
+				w.Header().Add("Content-Type", "application/json")
+				w.Write(bts)
+			}
+			if r.URL.Path == "/user/card/balance" {
+				f, _ := os.Open("./fakes/balance.json")
 				bts, _ := ioutil.ReadAll(f)
 				w.Header().Add("Content-Type", "application/json")
 				w.Write(bts)
@@ -29,15 +35,19 @@ func TestSuccessLoginAndBalance(t *testing.T) {
 	defer ts.Close()
 
 	client, _ := alelogo.New("a", "b", alelogo.Config{BaseURL: ts.URL})
-	cards, err := client.Balance()
+	cards, err := client.Cards()
 	if err != nil {
-		t.Error("Error getting balance", err)
+		t.Error("Error getting cards", err)
 	}
 	if len(cards) != 1 {
 		t.Error("cards len = ", len(cards))
 	}
-	if cards[0].Balance != "R$ 123,45" {
-		t.Error("Card balance = ", cards[0].Balance)
+	details, err := client.Details(cards[0])
+	if err != nil {
+		t.Error("Error getting balance", err)
+	}
+	if details.Balance != "R$ 123,45" {
+		t.Error("Card balance = ", details.Balance)
 	}
 }
 
@@ -48,7 +58,7 @@ func TestConnectionIssue(t *testing.T) {
 	if err == nil {
 		t.Error("Should have errored")
 	}
-	cards, err := client.Balance()
+	cards, err := client.Cards()
 	if err == nil {
 		t.Error("Should have errored")
 	}

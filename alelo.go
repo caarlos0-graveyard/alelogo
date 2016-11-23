@@ -102,6 +102,7 @@ func (client *Client) Cards() (cards []Card, err error) {
 	return preferences.List, err
 }
 
+// Details of a card, including balance
 func (client *Client) Details(card Card) (CardDetails, error) {
 	var details CardDetails
 	req, err := http.NewRequest(
