@@ -5,7 +5,7 @@ An unofficial Alelo API implementation to get Card's balances.
 ```go
 import (
   "log"
-  
+
   "github.com/caarlos0/alelogo"
 )
 
@@ -13,14 +13,20 @@ func main() {
   cpf := "123456789-10"
   pwd := "s3cr3t"
   client, err := alelogo.New(cpf, pwd)
-  if err != nil {
-    log.Fatalln(err.Error())
-  }
-  cards, err := client.Balance()
-  if err != nil {
-    log.Fatalln(err.Error())
-  }
-  log.Println(cards)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	cards, err := client.Cards()
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	for _, card := range cards {
+		result, err := client.Details(card)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		log.Println(result)
+	}
 }
 ```
 
