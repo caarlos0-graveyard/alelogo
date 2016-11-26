@@ -142,4 +142,5 @@ type CardDetails struct {
 	Balance string `json:"balance"`
 	Name    string `json:"productName"`
 	Type    string `json:"cardType"`
+	Number  string `json:"maskedNumber"`
 }
