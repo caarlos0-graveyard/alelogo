@@ -1,4 +1,4 @@
-# alelo-go [![Build Status](https://travis-ci.org/caarlos0/alelogo.svg?branch=master)](https://travis-ci.org/caarlos0/alelogo)
+# alelo-go [![Build Status](https://travis-ci.org/caarlos0/alelogo.svg?branch=master)](https://travis-ci.org/caarlos0/alelogo) [![SayThanks.io](https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg?style=flat-square)](https://saythanks.io/to/caarlos0)
 
 An unofficial Alelo API implementation to get Card's balances.
 
